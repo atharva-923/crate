@@ -28,6 +28,30 @@ crate/
     db.js, server.js, utils.js
 ```
 
+## Dataset
+
+The backend is powered by the **Olist Brazilian E-Commerce** public dataset.
+
+> 📦 **Download here:** [kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+
+After downloading, extract the CSVs into `server/csv-data/`:
+
+```
+server/
+  csv-data/
+    olist_customers_dataset.csv
+    olist_geolocation_dataset.csv
+    olist_order_items_dataset.csv
+    olist_order_payments_dataset.csv
+    olist_order_reviews_dataset.csv
+    olist_orders_dataset.csv
+    olist_products_dataset.csv
+    olist_sellers_dataset.csv
+    product_category_name_translation.csv
+```
+
+> **Note:** The `server/csv-data/` folder is git-ignored due to file size. You must download the dataset separately before running the import script.
+
 ## 1. Set up MySQL
 
 ```bash
