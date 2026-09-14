@@ -25,6 +25,7 @@ build/
 # Server environment — NEVER commit these
 # ========================
 server/.env
+server/csv-data/*.csv
 
 # ========================
 # Logs

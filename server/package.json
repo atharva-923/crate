@@ -1,17 +1,17 @@
 {
   "name": "crate-server",
   "version": "1.0.0",
-  "description": "Express + MySQL API for Crate, backed by the Olist dataset",
+  "description": "Express + MySQL API for Crate e-commerce platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "import": "node scripts/import.js",
-    "refresh-unsplash": "node scripts/refresh-unsplash.js"
+    "generate:dataset": "node scripts/generate-relational-dataset.js",
+    "seed:custom": "node scripts/seed-custom-db.js",
+    "test:adbms": "node scripts/test-adbms-queries.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "csv-parse": "^5.5.6",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mysql2": "^3.11.0"

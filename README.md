@@ -1,158 +1,85 @@
-# Crate — E-commerce Marketplace
+# Crate — E-commerce Marketplace & ADBMS Demo
 
-Crate is a **Next.js 14 (App Router)** e-commerce marketplace frontend, now backed by a
-real **Node.js/Express + MySQL** API populated from the [Olist Brazilian e-commerce
-dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce).
+Crate is a **Next.js 14 (App Router)** e-commerce marketplace frontend, backed by a real **Node.js/Express + MySQL** API. The database is populated by a custom-built 3NF relational dataset generator powered by real Amazon product data.
 
 ```
 Next.js 14 Frontend  →  HTTP/JSON  →  Node.js + Express  →  SQL  →  MySQL (crate_db)
 ```
 
-The UI itself — layout, navigation, colors, product cards, cart, checkout, seller
-dashboard — is unchanged from the original mock-data build. Only the data layer
-(`src/services/api/*`) and the handful of components that imported mock arrays directly
-were touched.
+This project serves as a comprehensive demonstration of Advanced Database Management Systems (ADBMS) concepts, including Window Functions, CTEs, Rollups, and complex joins, all running against a realistic e-commerce schema.
 
 ## Project layout
 
 ```
 crate/
-  src/                    Next.js frontend (unchanged UI, real API calls)
-    services/api/         talks to the Express backend (see below)
-    data/                 only what's still legitimately static (auth demo users, status labels)
-  server/                 Express + MySQL backend (new)
-    sql/schema.sql         relational schema for crate_db
-    sql/queries.sql         demo SQL — joins, aggregation, subquery, transaction, trigger, procedure
-    scripts/import.js       loads the Olist CSVs into MySQL
-    routes/                 REST endpoints (products, categories, sellers, orders, customers, reviews)
-    db.js, server.js, utils.js
+  src/                    Next.js frontend (UI, real API calls)
+  server/                 Express + MySQL backend
+    sql/schema.sql         Relational schema for crate_db (3NF)
+    sql/adbms_queries.sql  Advanced SQL queries demonstrating syllabus concepts
+    scripts/               Generates and seeds the database
+    routes/                REST endpoints (products, categories, sellers, orders, etc.)
+    db.js, server.js       Database connection and Express server setup
 ```
 
-## Dataset
+## Dataset & Seeding
 
-The backend is powered by the **Olist Brazilian E-Commerce** public dataset.
+The backend relies on a purely relational (3NF) database that is synthetically generated using real product titles and CDN images from the **Amazon India** public dataset. 
 
-> 📦 **Download here:** [kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+> 📦 **Dataset Generation:** Instead of using messy, incomplete real-world transaction logs, we use `scripts/generate-relational-dataset.js` to harvest authentic products from a raw Amazon CSV and surround them with perfectly normalized customers, sellers, temporal orders, and reviews.
 
-After downloading, extract the CSVs into `server/csv-data/`:
-
-```
-server/
-  csv-data/
-    olist_customers_dataset.csv
-    olist_geolocation_dataset.csv
-    olist_order_items_dataset.csv
-    olist_order_payments_dataset.csv
-    olist_order_reviews_dataset.csv
-    olist_orders_dataset.csv
-    olist_products_dataset.csv
-    olist_sellers_dataset.csv
-    product_category_name_translation.csv
-```
-
-> **Note:** The `server/csv-data/` folder is git-ignored due to file size. You must download the dataset separately before running the import script.
-
-## 1. Set up MySQL
+### 1. Set up MySQL Schema
 
 ```bash
 mysql -u root -p < server/sql/schema.sql
 ```
+This creates the `crate_db` database, tables, indexes, and views.
 
-This creates the `crate_db` database and all tables/indexes/views described below.
+### 2. Generate and Seed the Data
 
-## 2. Import the Olist dataset
+1. `cd server && cp .env.example .env` and fill in your MySQL credentials.
+2. `npm install`
+3. Download the [Amazon India Products CSV](https://www.kaggle.com/datasets/asaniczka/amazon-india-products-2023-1-5m-products) and place it at `server/csv-data/amazon_products.csv`.
+4. Generate the relational CSVs:
+   ```bash
+   npm run generate:dataset
+   ```
+5. Seed the MySQL database:
+   ```bash
+   npm run seed:custom
+   ```
 
-1. Extract the Olist CSV zip so the 9 CSVs sit in `server/csv-data/` (or point `CSV_DIR`
-   in `.env` somewhere else).
-2. `cd server && cp .env.example .env` and fill in your MySQL credentials.
-3. `npm install`
-4. `npm run import`
+## Running the Application
 
-The import script (`server/scripts/import.js`) loads categories → sellers → customers →
-geolocation → products → orders → order_items → payments → reviews, then runs a few
-aggregation queries to fill in fields the Olist dataset doesn't have directly (see
-**Data limitations** below).
-
-## 3. Run the backend
-
+**Run the backend:**
 ```bash
 cd server
-npm run start        # http://localhost:4000
-# or: npm run dev     # auto-restart on change
+npm run dev     # Starts Express API on http://localhost:4000
 ```
 
-## 4. Run the frontend
-
+**Run the frontend:**
 ```bash
-npm install           # from the crate/ root
-cp .env.local.example .env.local   # set NEXT_PUBLIC_API_URL if not localhost:4000
-npm run dev            # http://localhost:3000
+# From the crate/ root directory
+npm install
+cp .env.local.example .env.local   
+npm run dev     # Starts Next.js on http://localhost:3000
 ```
 
-## API endpoints
+## ADBMS Features Demonstrated
 
-| Method | Path | Notes |
-|---|---|---|
-| GET | `/api/products` | `?query=&category=&sort=&minPrice=&maxPrice=&inStockOnly=&page=&limit=` |
-| GET | `/api/products/:id` | single product, joined with category + seller |
-| GET | `/api/products/:id/related` | same-category products |
-| GET | `/api/reviews/:productId` | reviews, derived through order_items → orders → reviews |
-| GET | `/api/categories` | includes live product counts |
-| GET | `/api/sellers/:id` | profile + aggregated rating/review count |
-| GET | `/api/sellers/:id/products` \| `/orders` \| `/customers` \| `/stats` | seller dashboard data |
-| GET | `/api/orders/:id` | order + items + payments + customer city/state |
-| GET | `/api/customers/:id/orders` | a customer's order history |
-| GET | `/api/health` | liveness check |
+The `server/sql/adbms_queries.sql` file contains a suite of advanced queries tailored for a database management syllabus:
+- **Window Functions**: `DENSE_RANK()`, `ROW_NUMBER()` for Top-N per category.
+- **Value Functions**: `LAG()`, `LEAD()` for month-over-month revenue analysis.
+- **Aggregate Window Functions**: Moving averages and running cumulative totals.
+- **Advanced Grouping**: `WITH ROLLUP` for hierarchical regional sales.
+- **Common Table Expressions (CTEs)**: Recursive CTEs and multi-step data pipelines for Customer Lifetime Value (CLV).
 
-All queries are parameterized (`?` placeholders via `mysql2`) — nothing is built with
-string concatenation.
+Run the test script to verify all queries against the seeded database:
+```bash
+cd server
+npm run test:adbms
+```
 
-## Data limitations (documented, not hidden)
+## Demo Data Notes
 
-The Olist dataset is a real **operational** dataset, not a product-catalog export, so a
-few Crate-facing fields don't exist in it and had to be filled in deliberately rather
-than invented at random:
-
-- **Product name** — Olist has no product name field, only a category. Names are
-  synthesized as `"{Category} — Item {short id}"`.
-- **Product images** — Olist has no images. Each of the 73 categories maps to one
-  curated, fixed Unsplash photo (same approach the original mock catalog used), with a
-  generic fallback for unmapped categories. No random/external product-image API is used.
-- **Price** — Olist has no catalog price; it only records what each unit actually sold
-  for in `order_items`. A product's listed price is the **average of its order_items
-  prices**.
-- **Stock** — Olist has no inventory concept at all. Stock is a seeded pseudo-random
-  value per `product_id` (5–80 units), stable across re-imports, purely so the
-  in-stock/low-stock/out-of-stock UI has something to render. This is the one field that
-  is genuinely synthetic rather than derived, and is called out here rather than
-  presented as real.
-- **Discount %** — likewise not in Olist; seeded per product for UI variety (0/10/15/20%).
-- **Reviews are per-order, not per-product** in Olist. `product_reviews` is a SQL view
-  that joins `order_items → reviews`, so a product's reviews are "reviews of orders that
-  contained this product" — documented in `schema.sql`.
-- **Seller per product** — Olist links sellers to *order_items*, not to products
-  directly (a product can theoretically ship from more than one seller). Each product is
-  assigned the seller who sold it most often, computed with a window function during
-  import.
-
-## Not yet wired up
-
-- **Checkout doesn't write to MySQL.** `orderService.placeOrder()` still returns a
-  local, in-memory order object (see the comment in that file). Wiring it up means
-  inserting into `orders` / `order_items` / `payments` inside a transaction — the SQL
-  pattern is sketched in `server/sql/queries.sql` §16.
-- **New reviews can't be submitted** for the same reason: a real review needs a real
-  `order_id` to attach to. `POST /api/reviews/:productId` returns `501 Not Implemented`
-  with an explanation.
-- **Auth stays mocked**, per the original design — `src/services/api/authService.js` is
-  untouched. No real backend authentication was added, since Olist has no customer
-  credentials to authenticate against.
-
-## Demo data notes
-
-- Auth is mocked: any email + 6+ character password logs you into a demo customer or
-  seller account (`/login`, `/seller/login`).
-- To browse a real seller dashboard, log in with the seller demo flow, then substitute a
-  real `seller_id` from your imported `sellers` table (e.g. via `SELECT seller_id FROM
-  sellers LIMIT 1;`) — the demo seller login doesn't map to a specific imported seller.
-- For `/orders/:id`, use a real `order_id` from your imported `orders` table.
+- **Auth is mocked**: Any email + 6+ character password logs you into a demo customer or seller account (`/login`, `/seller/login`).
+- Checkout creates a local, in-memory order object (transactional insertion into MySQL is mapped out in SQL but left mocked in the JS layer for safety).
