@@ -21,7 +21,7 @@ router.get(
       maxPrice,
       inStockOnly,
       page = 1,
-      limit = 24,
+      limit = 25,
     } = req.query;
 
     const where = [];

@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
-
-const finalPrice = (p) => Math.round(p.price * (1 - (p.discount_percent || 0) / 100));
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/context/ToastContext";
 import StarRating from "@/components/ui/StarRating";
 import Badge from "@/components/ui/Badge";
+
+const finalPrice = (p) => Math.round(p.price * (1 - (p.discount_percent || 0) / 100));
 
 function IconHeart({ filled }) {
   return (
@@ -27,8 +29,11 @@ function IconHeart({ filled }) {
 export default function ProductCard({ product }) {
   const { isWishlisted, toggleWishlist } = useWishlist();
   const { customer, requireAuth } = useAuth();
+  const { addItem } = useCart();
+  const { showToast } = useToast();
   const price = finalPrice(product);
   const wishlisted = isWishlisted(product.product_id);
+  const inStock = product.stock !== 0;
 
   const handleWishlist = (e) => {
     e.preventDefault();
@@ -37,6 +42,13 @@ export default function ProductCard({ product }) {
       return;
     }
     toggleWishlist(product);
+  };
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    if (!inStock) return;
+    addItem(product);
+    showToast(`${product.name.slice(0, 30)}… added to cart`, "success");
   };
 
   return (
@@ -62,6 +74,17 @@ export default function ProductCard({ product }) {
             <span className="rounded bg-surface px-3 py-1 text-xs font-semibold text-ink">
               Out of stock
             </span>
+          </div>
+        )}
+        {/* Add to Cart hover button */}
+        {inStock && (
+          <div className="absolute bottom-0 left-0 right-0 translate-y-full transition-transform duration-200 group-hover:translate-y-0">
+            <button
+              onClick={handleAddToCart}
+              className="w-full bg-ink py-2.5 text-xs font-semibold uppercase tracking-wider text-ivory hover:bg-brass hover:text-ink transition-colors"
+            >
+              + Add to Cart
+            </button>
           </div>
         )}
         <button

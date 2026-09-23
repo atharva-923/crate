@@ -1,7 +1,7 @@
 import { request } from "./client";
 
-// GET /api/products?query=&category=&sort=&minPrice=&maxPrice=&inStockOnly=
-export async function fetchProducts({ query = "", category = "", sort = "relevance", minPrice, maxPrice, inStockOnly = false } = {}) {
+// GET /api/products?query=&category=&sort=&minPrice=&maxPrice=&inStockOnly=&page=
+export async function fetchProducts({ query = "", category = "", sort = "relevance", minPrice, maxPrice, inStockOnly = false, page = 1 } = {}) {
   const params = new URLSearchParams();
   if (query) params.set("query", query);
   if (category) params.set("category", category);
@@ -9,9 +9,11 @@ export async function fetchProducts({ query = "", category = "", sort = "relevan
   if (typeof minPrice === "number") params.set("minPrice", minPrice);
   if (typeof maxPrice === "number") params.set("maxPrice", maxPrice);
   if (inStockOnly) params.set("inStockOnly", "true");
+  params.set("page", page);
+  params.set("limit", 25);
 
-  const { products } = await request(`/api/products?${params.toString()}`);
-  return products;
+  // Returns { products, page, limit, total }
+  return request(`/api/products?${params.toString()}`);
 }
 
 // GET /api/products/:id
