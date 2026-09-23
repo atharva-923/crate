@@ -28,3 +28,21 @@ export default function Input({ className, error, ...props }) {
     />
   );
 }
+
+export function Select({ className, error, options = [], ...props }) {
+  return (
+    <select
+      className={cn(
+        "w-full rounded border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-muted transition-colors focus:border-brass focus:outline-none focus:ring-2 focus:ring-brass/25",
+        error ? "border-rust" : "border-line",
+        className
+      )}
+      {...props}
+    >
+      <option value="">Select...</option>
+      {options.map((opt) => (
+        <option key={opt} value={opt}>{opt}</option>
+      ))}
+    </select>
+  );
+}

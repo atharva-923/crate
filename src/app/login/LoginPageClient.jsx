@@ -74,9 +74,6 @@ export default function LoginPageClient() {
         <Button type="submit" variant="primary" className="w-full" size="lg" disabled={submitting}>
           {submitting ? "Logging in..." : "Log in"}
         </Button>
-        <p className="text-center text-xs text-ink-muted">
-          Demo tip: use any email and a password with 6+ characters.
-        </p>
       </form>
 
       <p className="mt-6 text-center text-sm text-ink-muted">

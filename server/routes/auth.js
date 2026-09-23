@@ -44,7 +44,7 @@ router.post(
 router.post(
   "/customer/register",
   asyncHandler(async (req, res) => {
-    const { email, password, firstName, lastName, city, state } = req.body;
+    const { email, password, firstName, lastName, city, state, country, postalCode } = req.body;
     if (!email || !password) throw new ApiError(400, "Email and password are required");
 
     // Check if email exists
@@ -56,8 +56,8 @@ router.post(
 
     await pool.query(
       `INSERT INTO customers (customer_id, customer_unique_id, customer_zip_prefix, customer_city, customer_state, email, password_hash) 
-       VALUES (?, ?, '400001', ?, ?, ?, ?)`,
-      [customer_id, customer_id, city || "Mumbai", state || "MH", email, hash]
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [customer_id, customer_id, postalCode || "000000", city || "Mumbai", state || "MH", email, hash]
     );
 
     const token = generateToken({ customer_id, email });
@@ -66,8 +66,10 @@ router.post(
     res.json({
       customer_id,
       email,
+      first_name: firstName || "",
+      last_name: lastName || "",
       customer_city: city || "Mumbai",
-      customer_state: state || "MH"
+      customer_state: state || "MH",
     });
   })
 );

@@ -7,7 +7,8 @@ import { registerCustomer } from "@/services/api/authService";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import { isValidEmail, isValidPhone, isValidPincode, isStrongPassword, required } from "@/lib/validation";
-import Input, { Field } from "@/components/ui/Input";
+import { LOCATIONS } from "@/lib/locations";
+import Input, { Field, Select } from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 
 const initialForm = {
@@ -44,8 +45,9 @@ export default function RegisterPage() {
     if (!isStrongPassword(form.password)) errs.password = "Use at least 8 characters";
     if (form.password !== form.confirmPassword) errs.confirmPassword = "Passwords don't match";
     if (!required(form.address)) errs.address = "Address is required";
-    if (!required(form.city)) errs.city = "City is required";
+    if (!required(form.country)) errs.country = "Country is required";
     if (!required(form.state)) errs.state = "State is required";
+    if (!required(form.city)) errs.city = "City is required";
     if (!isValidPincode(form.postalCode)) errs.postalCode = "Enter a valid postal code";
     setErrors(errs);
     if (Object.keys(errs).length) return;
@@ -102,17 +104,38 @@ export default function RegisterPage() {
             <Field label="Address" required error={errors.address} className="sm:col-span-2">
               <Input value={form.address} onChange={set("address")} error={errors.address} />
             </Field>
-            <Field label="City" required error={errors.city}>
-              <Input value={form.city} onChange={set("city")} error={errors.city} />
+            <Field label="Country" required error={errors.country}>
+              <Select 
+                value={form.country} 
+                onChange={(e) => setForm({ ...form, country: e.target.value, state: "", city: "" })} 
+                options={Object.keys(LOCATIONS)} 
+                error={errors.country} 
+              />
             </Field>
             <Field label="State" required error={errors.state}>
-              <Input value={form.state} onChange={set("state")} error={errors.state} />
+              <Select 
+                value={form.state} 
+                onChange={(e) => setForm({ ...form, state: e.target.value, city: "" })} 
+                options={form.country ? Object.keys(LOCATIONS[form.country] || {}) : []} 
+                error={errors.state} 
+                disabled={!form.country}
+              />
+            </Field>
+            <Field label="City" required error={errors.city}>
+              <Select 
+                value={form.city} 
+                onChange={set("city")} 
+                options={form.country && form.state
+                  ? (LOCATIONS[form.country][form.state]?.length
+                      ? LOCATIONS[form.country][form.state]
+                      : [form.state])
+                  : []} 
+                error={errors.city} 
+                disabled={!form.state}
+              />
             </Field>
             <Field label="Postal code" required error={errors.postalCode}>
               <Input value={form.postalCode} onChange={set("postalCode")} error={errors.postalCode} />
-            </Field>
-            <Field label="Country" required>
-              <Input value={form.country} onChange={set("country")} />
             </Field>
           </div>
         </div>

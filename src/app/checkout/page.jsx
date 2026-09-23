@@ -8,9 +8,10 @@ import { useToast } from "@/context/ToastContext";
 import { placeOrder } from "@/services/api/orderService";
 import { formatCurrency } from "@/lib/utils";
 import { isValidPincode, required } from "@/lib/validation";
+import { LOCATIONS } from "@/lib/locations";
 import Stepper from "@/components/ui/Stepper";
 import Button from "@/components/ui/Button";
-import Input, { Field } from "@/components/ui/Input";
+import Input, { Field, Select } from "@/components/ui/Input";
 import OrderSummary from "@/components/cart/OrderSummary";
 import EmptyState from "@/components/ui/EmptyState";
 
@@ -62,8 +63,9 @@ export default function CheckoutPage() {
   const validateAddress = () => {
     const errs = {};
     if (!required(address.line1)) errs.line1 = "Address is required";
-    if (!required(address.city)) errs.city = "City is required";
+    if (!required(address.country)) errs.country = "Country is required";
     if (!required(address.state)) errs.state = "State is required";
+    if (!required(address.city)) errs.city = "City is required";
     if (!isValidPincode(address.postalCode)) errs.postalCode = "Enter a valid postal code";
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -120,17 +122,38 @@ export default function CheckoutPage() {
                 <Input value={address.line2} onChange={(e) => setAddress({ ...address, line2: e.target.value })} />
               </Field>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="City" required error={errors.city}>
-                  <Input value={address.city} onChange={(e) => setAddress({ ...address, city: e.target.value })} error={errors.city} />
+                <Field label="Country" required error={errors.country}>
+                  <Select 
+                    value={address.country} 
+                    onChange={(e) => setAddress({ ...address, country: e.target.value, state: "", city: "" })} 
+                    options={Object.keys(LOCATIONS)} 
+                    error={errors.country} 
+                  />
                 </Field>
                 <Field label="State" required error={errors.state}>
-                  <Input value={address.state} onChange={(e) => setAddress({ ...address, state: e.target.value })} error={errors.state} />
+                  <Select 
+                    value={address.state} 
+                    onChange={(e) => setAddress({ ...address, state: e.target.value, city: "" })} 
+                    options={address.country ? Object.keys(LOCATIONS[address.country] || {}) : []} 
+                    error={errors.state} 
+                    disabled={!address.country}
+                  />
+                </Field>
+                <Field label="City" required error={errors.city}>
+                  <Select 
+                    value={address.city} 
+                    onChange={(e) => setAddress({ ...address, city: e.target.value })} 
+                    options={address.country && address.state
+                      ? (LOCATIONS[address.country][address.state]?.length
+                          ? LOCATIONS[address.country][address.state]
+                          : [address.state])
+                      : []} 
+                    error={errors.city} 
+                    disabled={!address.state}
+                  />
                 </Field>
                 <Field label="Postal code" required error={errors.postalCode}>
                   <Input value={address.postalCode} onChange={(e) => setAddress({ ...address, postalCode: e.target.value })} error={errors.postalCode} />
-                </Field>
-                <Field label="Country" required>
-                  <Input value={address.country} onChange={(e) => setAddress({ ...address, country: e.target.value })} />
                 </Field>
               </div>
             </div>
