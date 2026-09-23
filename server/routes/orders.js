@@ -5,6 +5,36 @@ const { authCustomer } = require("../middleware/auth");
 
 const router = express.Router();
 
+// GET /api/customers/:customerId/orders  — order list for account page
+router.get(
+  "/customer/:customerId",
+  asyncHandler(async (req, res) => {
+    const { customerId } = req.params;
+    const [orders] = await pool.query(
+      `SELECT o.order_id, o.order_status AS status, o.order_purchase_timestamp AS placed_at,
+              COALESCE(SUM(p.payment_value), 0) AS total,
+              COUNT(DISTINCT oi.order_item_id) AS item_count
+       FROM orders o
+       LEFT JOIN payments p ON p.order_id = o.order_id
+       LEFT JOIN order_items oi ON oi.order_id = o.order_id
+       WHERE o.customer_id = ?
+       GROUP BY o.order_id
+       ORDER BY o.order_purchase_timestamp DESC
+       LIMIT 20`,
+      [customerId]
+    );
+    // Normalize status
+    const normalized = orders.map(o => ({
+      order_id: o.order_id,
+      placed_at: o.placed_at,
+      status: o.status === "delivered" ? "Delivered" : o.status === "shipped" ? "Shipped" : "Processing",
+      total: Number(o.total),
+      items: Array(Number(o.item_count)).fill(null), // stub array so .length works on frontend
+    }));
+    res.json(normalized);
+  })
+);
+
 // GET /api/orders/:id
 router.get(
   "/:id",
