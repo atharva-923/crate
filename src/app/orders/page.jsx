@@ -46,7 +46,7 @@ export default function OrdersPage() {
                 </div>
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
                   <p className="text-sm text-ink-soft">
-                    {o.items.map((i) => i.name).join(", ")}
+                    {o.items.length} item{o.items.length !== 1 ? "s" : ""}
                   </p>
                   <p className="font-mono text-sm font-semibold text-ink">{formatCurrency(o.total)}</p>
                 </div>
