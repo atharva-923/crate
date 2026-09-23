@@ -30,9 +30,9 @@ export default function HomePage() {
 
   useEffect(() => {
     Promise.all([fetchCategories(), fetchProducts({ sort: "rating" })]).then(
-      ([cats, products]) => {
+      ([cats, res]) => {
         setCategories(cats);
-        setBestsellers(products.slice(0, 8));
+        setBestsellers((res.products || res).slice(0, 8));
         setLoading(false);
       }
     );
