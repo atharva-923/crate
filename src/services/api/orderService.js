@@ -1,8 +1,19 @@
 import { request } from "./client";
 
-// GET /api/customers/:id/orders
-export function fetchOrdersByCustomer(customerId) {
-  return request(`/api/customers/${customerId}/orders`);
+// GET /api/orders?customerId=...  (normalized list for account page)
+export async function fetchOrdersByCustomer(customerId) {
+  try {
+    const orders = await request(`/api/customers/${customerId}/orders`);
+    return Array.isArray(orders) ? orders.map(o => ({
+      ...o,
+      items: o.items || [],
+      total: o.total || o.payment_value || 0,
+      placed_at: o.placed_at || o.order_purchase_timestamp,
+      status: o.status || o.order_status || "Processing",
+    })) : [];
+  } catch {
+    return [];
+  }
 }
 
 // Maps a real Olist order_status + timestamps onto Crate's 5-stage timeline UI.
