@@ -1,6 +1,6 @@
 import { request } from "./client";
 
-// GET /api/orders?customerId=...  (normalized list for account page)
+// Fetch all orders for a customer (used on account + orders pages)
 export async function fetchOrdersByCustomer(customerId) {
   try {
     const orders = await request(`/api/customers/${customerId}/orders`);
@@ -16,7 +16,6 @@ export async function fetchOrdersByCustomer(customerId) {
   }
 }
 
-// Maps a real Olist order_status + timestamps onto Crate's 5-stage timeline UI.
 const STAGES = ["Order Placed", "Processing", "Shipped", "Out for Delivery", "Delivered"];
 
 function normalizeOrder(raw) {
