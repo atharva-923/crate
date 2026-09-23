@@ -70,6 +70,7 @@ router.post(
       last_name: lastName || "",
       customer_city: city || "Mumbai",
       customer_state: state || "MH",
+      customer_zip_prefix: postalCode || "000000",
     });
   })
 );

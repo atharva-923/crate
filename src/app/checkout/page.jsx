@@ -33,14 +33,25 @@ export default function CheckoutPage() {
   const router = useRouter();
 
   const defaultAddress = customer?.addresses?.[0];
+  const initialState = customer?.customer_state || "";
+  let initialCountry = defaultAddress?.country || "India";
+  if (!defaultAddress?.country && initialState) {
+    for (const c of Object.keys(LOCATIONS)) {
+      if (LOCATIONS[c][initialState]) {
+        initialCountry = c;
+        break;
+      }
+    }
+  }
+
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState({
     line1: defaultAddress?.line1 || "",
     line2: defaultAddress?.line2 || "",
-    city: defaultAddress?.city || "",
-    state: defaultAddress?.state || "",
-    postalCode: defaultAddress?.postal_code || "",
-    country: defaultAddress?.country || "India",
+    city: defaultAddress?.city || customer?.customer_city || "",
+    state: defaultAddress?.state || initialState,
+    postalCode: defaultAddress?.postal_code || customer?.customer_zip_prefix || "",
+    country: initialCountry,
   });
   const [errors, setErrors] = useState({});
   const [delivery, setDelivery] = useState("standard");
