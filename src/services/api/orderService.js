@@ -79,17 +79,9 @@ export async function fetchOrderById(orderId) {
   }
 }
 
-// POST /api/orders
-// Not implemented server-side yet — Crate's checkout flow still creates a
-// local order object rather than writing to MySQL. Wiring this up means
-// inserting into orders/order_items/payments inside a transaction
-// (see server/sql/queries.sql §16 for the pattern) and is a good next step.
 export function placeOrder(orderDraft) {
-  return Promise.resolve({
-    order_id: `CRT-${Math.floor(10000 + Math.random() * 89999)}`,
-    placed_at: new Date().toISOString(),
-    status: "Order Placed",
-    timeline: STAGES.map((status, idx) => ({ status, done: idx === 0, at: idx === 0 ? new Date().toISOString() : null })),
-    ...orderDraft,
+  return request("/api/orders", {
+    method: "POST",
+    body: JSON.stringify(orderDraft),
   });
 }

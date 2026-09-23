@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { logoutCustomerApi, logoutSellerApi } from "../services/api/authService";
 
 const AuthContext = createContext(null);
 
@@ -31,7 +32,8 @@ export function AuthProvider({ children }) {
     localStorage.setItem(CUSTOMER_KEY, JSON.stringify(data));
   };
 
-  const logoutCustomer = () => {
+  const logoutCustomer = async () => {
+    try { await logoutCustomerApi(); } catch (e) {}
     setCustomer(null);
     localStorage.removeItem(CUSTOMER_KEY);
   };
@@ -41,7 +43,8 @@ export function AuthProvider({ children }) {
     localStorage.setItem(SELLER_KEY, JSON.stringify(data));
   };
 
-  const logoutSeller = () => {
+  const logoutSeller = async () => {
+    try { await logoutSellerApi(); } catch (e) {}
     setSeller(null);
     localStorage.removeItem(SELLER_KEY);
   };

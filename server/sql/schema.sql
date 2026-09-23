@@ -30,7 +30,9 @@ CREATE TABLE sellers (
   seller_state      CHAR(2),
   -- Crate-facing fields not present in Olist; sensible defaults, documented in README.
   display_name      VARCHAR(150) NOT NULL,
-  rating             DECIMAL(2,1) DEFAULT 4.5
+  rating             DECIMAL(2,1) DEFAULT 4.5,
+  email             VARCHAR(255) UNIQUE,
+  password_hash     VARCHAR(255)
 ) ENGINE=InnoDB;
 CREATE INDEX idx_sellers_state ON sellers (seller_state);
 
@@ -42,7 +44,9 @@ CREATE TABLE customers (
   customer_unique_id  VARCHAR(32) NOT NULL,
   customer_zip_prefix VARCHAR(10),
   customer_city       VARCHAR(100),
-  customer_state      CHAR(2)
+  customer_state      CHAR(2),
+  email               VARCHAR(255) UNIQUE,
+  password_hash       VARCHAR(255)
 ) ENGINE=InnoDB;
 CREATE INDEX idx_customers_unique ON customers (customer_unique_id);
 CREATE INDEX idx_customers_state ON customers (customer_state);

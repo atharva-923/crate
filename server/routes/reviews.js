@@ -1,6 +1,7 @@
 const express = require("express");
 const pool = require("../db");
-const { asyncHandler } = require("../utils");
+const { asyncHandler, ApiError } = require("../utils");
+const { authCustomer } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -29,14 +30,36 @@ router.get(
 );
 
 // POST /api/reviews/:productId
-// Olist reviews are tied to real orders, so we can't legitimately attach a
-// new review to a product without an order_id. This endpoint is left as a
-// documented stub — wire it up once your checkout flow creates real orders.
-router.post("/:productId", (req, res) => {
-  res.status(501).json({
-    error:
-      "Submitting new reviews requires an associated order_id and isn't wired up yet — see server/routes/reviews.js",
-  });
-});
+router.post(
+  "/:productId",
+  authCustomer,
+  asyncHandler(async (req, res) => {
+    const { rating, title, comment } = req.body;
+    if (!rating || rating < 1 || rating > 5) throw new ApiError(400, "Valid rating (1-5) is required");
+
+    // Verify the customer has actually purchased and received this product
+    const [[purchase]] = await pool.query(
+      `SELECT o.order_id
+       FROM orders o
+       JOIN order_items oi ON oi.order_id = o.order_id
+       WHERE o.customer_id = ? AND oi.product_id = ? AND o.order_status = 'delivered'
+       LIMIT 1`,
+      [req.customer.customer_id, req.params.productId]
+    );
+
+    if (!purchase) {
+      throw new ApiError(403, "You can only review products you have purchased and received.");
+    }
+
+    const review_id = `rev_${Date.now()}`;
+    await pool.query(
+      `INSERT INTO reviews (review_id, order_id, review_score, review_comment_title, review_comment_message, review_creation_date)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+      [review_id, purchase.order_id, rating, title || "", comment || ""]
+    );
+
+    res.json({ success: true, message: "Review submitted successfully" });
+  })
+);
 
 module.exports = router;

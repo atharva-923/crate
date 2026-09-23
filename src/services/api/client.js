@@ -47,6 +47,7 @@ export async function request(path, options = {}) {
   try {
     res = await fetch(`${BASE_URL}${path}`, {
       headers: { "Content-Type": "application/json", ...options.headers },
+      credentials: "include",
       ...options,
     });
   } catch (err) {

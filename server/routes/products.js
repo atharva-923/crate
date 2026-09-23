@@ -1,6 +1,7 @@
 const express = require("express");
 const pool = require("../db");
 const { asyncHandler, ApiError } = require("../utils");
+const { authSeller } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -149,6 +150,88 @@ router.get(
       reviews: rows.map((r) => ({ ...r, customer_name: "Verified Buyer", verified_purchase: true })),
       average: average || 0,
     });
+  })
+);
+
+// POST /api/products
+router.post(
+  "/",
+  authSeller,
+  asyncHandler(async (req, res) => {
+    const { name, sku, price, category_id, stock, description, image, discount_percent } = req.body;
+    if (!name || !sku || !price || !category_id) {
+      throw new ApiError(400, "Name, sku, price, and category_id are required");
+    }
+
+    const product_id = `prod_${Date.now()}`;
+    await pool.query(
+      `INSERT INTO products (product_id, category_id, seller_id, name, sku, price, discount_percent, stock, image, description)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        product_id,
+        category_id,
+        req.seller.seller_id,
+        name,
+        sku,
+        price,
+        discount_percent || 0,
+        stock || 0,
+        image || "",
+        description || "",
+      ]
+    );
+
+    res.json({ product_id, message: "Product created successfully" });
+  })
+);
+
+// PUT /api/products/:id
+router.put(
+  "/:id",
+  authSeller,
+  asyncHandler(async (req, res) => {
+    const { name, sku, price, category_id, stock, description, image, discount_percent } = req.body;
+
+    const [[product]] = await pool.query("SELECT seller_id FROM products WHERE product_id = ?", [req.params.id]);
+    if (!product) throw new ApiError(404, "Product not found");
+    if (product.seller_id !== req.seller.seller_id) {
+      throw new ApiError(403, "You do not have permission to modify this product");
+    }
+
+    const updates = [];
+    const values = [];
+
+    if (name !== undefined) { updates.push("name = ?"); values.push(name); }
+    if (sku !== undefined) { updates.push("sku = ?"); values.push(sku); }
+    if (price !== undefined) { updates.push("price = ?"); values.push(price); }
+    if (category_id !== undefined) { updates.push("category_id = ?"); values.push(category_id); }
+    if (stock !== undefined) { updates.push("stock = ?"); values.push(stock); }
+    if (description !== undefined) { updates.push("description = ?"); values.push(description); }
+    if (image !== undefined) { updates.push("image = ?"); values.push(image); }
+    if (discount_percent !== undefined) { updates.push("discount_percent = ?"); values.push(discount_percent); }
+
+    if (updates.length > 0) {
+      values.push(req.params.id);
+      await pool.query(`UPDATE products SET ${updates.join(", ")} WHERE product_id = ?`, values);
+    }
+
+    res.json({ success: true, message: "Product updated successfully" });
+  })
+);
+
+// DELETE /api/products/:id
+router.delete(
+  "/:id",
+  authSeller,
+  asyncHandler(async (req, res) => {
+    const [[product]] = await pool.query("SELECT seller_id FROM products WHERE product_id = ?", [req.params.id]);
+    if (!product) throw new ApiError(404, "Product not found");
+    if (product.seller_id !== req.seller.seller_id) {
+      throw new ApiError(403, "You do not have permission to delete this product");
+    }
+
+    await pool.query("DELETE FROM products WHERE product_id = ?", [req.params.id]);
+    res.json({ success: true, message: "Product deleted successfully" });
   })
 );
 
