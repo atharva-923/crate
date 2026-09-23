@@ -46,7 +46,7 @@ export default function CheckoutPage() {
 
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState({
-    line1: defaultAddress?.line1 || "",
+    line1: defaultAddress?.line1 || customer?.customer_address || "",
     line2: defaultAddress?.line2 || "",
     city: defaultAddress?.city || customer?.customer_city || "",
     state: defaultAddress?.state || initialState,
