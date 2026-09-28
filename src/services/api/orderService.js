@@ -68,12 +68,12 @@ function normalizeOrder(raw) {
     total: Math.round(subtotal + deliveryFee),
     address: raw.customer
       ? {
-          line1: "Address on file",
+          line1: raw.customer.customer_address || "Address on file",
           line2: "",
           city: raw.customer.customer_city,
           state: raw.customer.customer_state,
-          postal_code: "",
-          country: "Brazil",
+          postal_code: raw.customer.customer_zip_prefix || "",
+          country: "India",
         }
       : { line1: "Address on file", line2: "", city: "-", state: "-", postal_code: "", country: "-" },
   };

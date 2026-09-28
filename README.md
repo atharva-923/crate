@@ -82,4 +82,4 @@ npm run test:adbms
 ## Demo Data Notes
 
 - **Auth is mocked**: Any email + 6+ character password logs you into a demo customer or seller account (`/login`, `/seller/login`).
-- Checkout creates a local, in-memory order object (transactional insertion into MySQL is mapped out in SQL but left mocked in the JS layer for safety).
+- Checkout now creates real orders and payments directly in the MySQL database, completing the end-to-end shopping flow.
