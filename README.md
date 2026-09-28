@@ -12,8 +12,9 @@ This project serves as a comprehensive demonstration of Advanced Database Manage
 
 ```
 crate/
-  src/                    Next.js frontend (UI, real API calls)
-  server/                 Express + MySQL backend
+  frontend/               Next.js frontend (UI, real API calls)
+    src/                   React components, contexts, pages
+  backend/                Express + MySQL backend
     sql/schema.sql         Relational schema for crate_db (3NF)
     sql/adbms_queries.sql  Advanced SQL queries demonstrating syllabus concepts
     scripts/               Generates and seeds the database
@@ -30,15 +31,15 @@ The backend relies on a purely relational (3NF) database that is synthetically g
 ### 1. Set up MySQL Schema
 
 ```bash
-mysql -u root -p < server/sql/schema.sql
+mysql -u root -p < backend/sql/schema.sql
 ```
 This creates the `crate_db` database, tables, indexes, and views.
 
 ### 2. Generate and Seed the Data
 
-1. `cd server && cp .env.example .env` and fill in your MySQL credentials.
+1. `cd backend && cp .env.example .env` and fill in your MySQL credentials.
 2. `npm install`
-3. Download the [Amazon India Products CSV](https://www.kaggle.com/datasets/asaniczka/amazon-india-products-2023-1-5m-products) and place it at `server/csv-data/amazon_products.csv`.
+3. Download the [Amazon India Products CSV](https://www.kaggle.com/datasets/asaniczka/amazon-india-products-2023-1-5m-products) and place it at `backend/csv-data/amazon_products.csv`.
 4. Generate the relational CSVs:
    ```bash
    npm run generate:dataset
@@ -52,13 +53,13 @@ This creates the `crate_db` database, tables, indexes, and views.
 
 **Run the backend:**
 ```bash
-cd server
+cd backend
 npm run dev     # Starts Express API on http://localhost:4000
 ```
 
 **Run the frontend:**
 ```bash
-# From the crate/ root directory
+cd frontend
 npm install
 cp .env.local.example .env.local   
 npm run dev     # Starts Next.js on http://localhost:3000
@@ -66,7 +67,7 @@ npm run dev     # Starts Next.js on http://localhost:3000
 
 ## ADBMS Features Demonstrated
 
-The `server/sql/adbms_queries.sql` file contains a suite of advanced queries tailored for a database management syllabus:
+The `backend/sql/adbms_queries.sql` file contains a suite of advanced queries tailored for a database management syllabus:
 - **Window Functions**: `DENSE_RANK()`, `ROW_NUMBER()` for Top-N per category.
 - **Value Functions**: `LAG()`, `LEAD()` for month-over-month revenue analysis.
 - **Aggregate Window Functions**: Moving averages and running cumulative totals.
@@ -75,7 +76,7 @@ The `server/sql/adbms_queries.sql` file contains a suite of advanced queries tai
 
 Run the test script to verify all queries against the seeded database:
 ```bash
-cd server
+cd backend
 npm run test:adbms
 ```
 

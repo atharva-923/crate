@@ -1,0 +1,23 @@
+category_id,name,slug,image
+1,Headphones & Audio,audio,https://m.media-amazon.com/images/I/811RreTN3rL._AC_UL320_.jpg
+2,Computers & Laptops,computers,https://m.media-amazon.com/images/I/91E+817GB5L._AC_UL320_.jpg
+3,Computer Accessories,computer-accessories,https://m.media-amazon.com/images/I/81QpkIctqPL._AC_UL320_.jpg
+4,Cell Phones & Accessories,cell-phones,https://m.media-amazon.com/images/I/61M5yvNC22L._AC_UL320_.jpg
+5,Televisions & Home Theater,televisions-video,https://m.media-amazon.com/images/I/718x1vTL4EL._AC_UL320_.jpg
+6,Gaming & Consoles,gaming,https://m.media-amazon.com/images/I/61O9tWR6WDS._AC_UY218_.jpg
+7,Men's Clothing,mens-clothing,https://m.media-amazon.com/images/I/71QyRZzbaUL._AC_UL320_.jpg
+8,Women's Clothing,womens-clothing,https://m.media-amazon.com/images/I/71R5KCBtizL._AC_UL320_.jpg
+9,Footwear & Shoes,shoes,https://m.media-amazon.com/images/I/41jua5IBHQL._AC_UL320_.jpg
+10,Watches,watches,https://m.media-amazon.com/images/I/51ChCHnhQ2L._AC_UL320_.jpg
+11,Jewelry & Accessories,jewelry,https://m.media-amazon.com/images/I/81cippn3KWL._AC_UL320_.jpg
+12,Backpacks & Luggage,luggage-backpacks,https://m.media-amazon.com/images/I/71tClMxVY9L._AC_UL320_.jpg
+13,Furniture & Decor,furniture,https://m.media-amazon.com/images/I/81bNj5P6soL._AC_UL320_.jpg
+14,Wall Art & Decor,wall-art,https://m.media-amazon.com/images/I/61XVqW-rrwL._AC_UL320_.jpg
+15,Kitchen & Dining,kitchen-dining,https://m.media-amazon.com/images/I/81A9iJJYGML._AC_UL320_.jpg
+16,Bed & Bath,bed-bath,https://m.media-amazon.com/images/I/71ibxVZi9BL._AC_UL320_.jpg
+17,Beauty & Skin Care,beauty-skincare,https://m.media-amazon.com/images/I/71Lkd6dc0BL._AC_UL320_.jpg
+18,Baby & Nursery,baby,https://m.media-amazon.com/images/I/71EDKJlf8UL._AC_UL320_.jpg
+19,Sports & Fitness,sports-fitness,https://m.media-amazon.com/images/I/91vIBNDOT7L._AC_UL320_.jpg
+20,Pet Supplies,pet-supplies,https://m.media-amazon.com/images/I/61mAU6tBC6L._AC_UL320_.jpg
+21,Automotive & Car Care,automotive,https://m.media-amazon.com/images/I/51apbn1v2lL._AC_UL320_.jpg
+22,Tools & Home Improvement,tools-hardware,https://m.media-amazon.com/images/I/51S6W-ovUBL._AC_UL320_.jpg
